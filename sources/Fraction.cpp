@@ -1,144 +1,258 @@
 #include "Fraction.hpp"
 #include <cmath>
 
-namespace ariel{
+namespace ariel
+{
 
-// Help function
+    // Help function
     int Fraction::gcd(int num1, int num2)
     {
-        if (num2 == 0) return num1;
+        if (num2 == 0)
+            return num1;
         return Fraction::gcd(num2, num1 % num2);
     }
 
-// Constructors
-    Fraction::Fraction(int numerator, int denominator)
+    void Fraction::reduce()
     {
-        this->numerator= numerator;
-        this->denominator = denominator;
+
+        int gcdValue;
+        gcdValue = this->gcd(this->numerator, this->denominator);
+
+        this->numerator /= gcdValue;
+        this->denominator /= gcdValue;
     }
 
-    Fraction::Fraction(float num) {
+    // Constructors
+    Fraction::Fraction(int numerator, int denominator)
+    {
+        this->numerator = numerator;
+        this->denominator = denominator;
+        this->reduce();
+    }
+
+    Fraction::Fraction(float num)
+    {
         // Check if the number is zero
-        if (num == 0) {
+        if (num == 0)
+        {
             numerator = 0;
             denominator = 1;
             return;
         }
-        
-        // Calculate the initial approximation
-        float approx = num;
-        int sign = 1;
-        if (num < 0) {
-            approx = -approx;
-            sign = -1;
-        }
-        
-        int wholePart = floor(approx);
-        float fractionalPart = approx - wholePart;
-        
-        // Limit the fractional part to 3 decimal places
-        fractionalPart = std::floor(fractionalPart * 1000) / 1000;
-        
-        // Continued fraction expansion
-        int a = wholePart;
-        int h1 = 1, h2 = 0;
-        int k1 = 0, k2 = 1;
-        
-        while (approx - static_cast<float>(a) > 0.000001) {
-            approx = 1 / (approx - static_cast<float>(a));
-            a = floor(approx);
-            
-            int h = a * h1 + h2;
-            int k = a * k1 + k2;
-            
-            h2 = h1;
-            h1 = h;
-            k2 = k1;
-            k1 = k;
-        }
-        
-        numerator = sign * (wholePart * k1 + h1);
-        denominator = k1;
+
+        this->numerator = num * 1000;
+        this->denominator = 1000;
+        this->reduce();
     }
 
-    void reduce(Fraction& fraction) 
+    // Operators Part
+
+    // Operator <<
+    std::ostream &operator<<(std::ostream &ostr, const ariel::Fraction &f)
     {
-    int gcdValue;
-    gcdValue = fraction.gcd(fraction.numerator, fraction.denominator);
-    
-    fraction.numerator /= gcdValue;
-    fraction.denominator /= gcdValue;
-    }
-
-    
-    //Fraction::Fraction(const Fraction& other) 
-    //{
-    //    this->numerator= other.numerator;
-    //    this->denominator = other.numerator;
-    //}
-
-    // Operators 
-
-    std::ostream& operator<<(std::ostream& ostr, const ariel::Fraction& f)
-    {
-        ostr << f.numerator<< "/" << f.denominator;
+        ostr << f.numerator << "/" << f.denominator;
         return ostr;
     }
 
-    Fraction operator+(const Fraction& frac1, const Fraction& frac2)
+    // Operator >>
+    std::istream &operator>>(istream& num , Fraction& frac1)
+    {
+        
+    }
+
+    Fraction operator+(const Fraction &frac1, const Fraction &frac2)
     {
         int numerator = (frac1.numerator * frac2.denominator) + (frac2.numerator * frac1.denominator);
         int denominator = frac1.denominator * frac2.denominator;
-    
+
         Fraction frac = Fraction(numerator, denominator);
-        reduce(frac);
         return frac;
     }
 
     Fraction operator+(const Fraction &frac1, const float num)
     {
-        return 1;
+        Fraction frac = Fraction(num);
+        Fraction res = frac + frac1;
+        // res.reduce();
+        return res;
     }
-    Fraction operator-(const Fraction& frac1 , const Fraction& frac2)
+    Fraction operator-(const Fraction &frac1, const Fraction &frac2)
     {
-        return 1;
+        int numerator = (frac1.numerator * frac2.denominator) - (frac2.numerator * frac1.denominator);
+        int denominator = frac1.denominator * frac2.denominator;
+
+        Fraction frac = Fraction(numerator, denominator);
+        return frac;
     }
-    Fraction operator-(const Fraction& frac1 , const int num)
+
+    Fraction operator-(const Fraction &frac1, float num)
     {
-        return 1;
+        Fraction frac = Fraction(num);
+        return frac1 - frac;
     }
-    Fraction operator/(const Fraction& frac1 , const Fraction& frac2)
+
+    Fraction operator-(float num, const Fraction &frac1)
     {
-        return 1;
+        Fraction frac = Fraction(num);
+        return frac1 - frac;
     }
-    Fraction operator*(const Fraction& frac1 , const Fraction& frac2)
+
+    Fraction operator/(const Fraction &frac1, const Fraction &frac2)
     {
-        return 1;
+        if (frac2.numerator == 0)
+        {
+            throw std::runtime_error("Division by zero is unposibble.");
+        }
+
+        int numerator = frac1.numerator * frac2.denominator;
+        int denominator = frac1.denominator * frac2.numerator;
+
+        Fraction frac = Fraction(numerator, denominator);
+        return frac;
     }
-    Fraction operator*(const float num , const Fraction& frac1)
+    Fraction operator*(const Fraction &frac1, const Fraction &frac2)
     {
-        return 1;
+        int numerator = frac1.numerator * frac2.numerator;
+        int denominator = frac1.denominator * frac2.denominator;
+        Fraction frac = Fraction(numerator, denominator);
+        return frac;
     }
-    Fraction operator++(const Fraction& frac1 , int num)
+    Fraction operator*(float num, const Fraction &frac1)
     {
-        return 1;
+        Fraction frac = Fraction(frac1.numerator * (int)(num * 1000), 1000 * frac1.denominator);
+        // frac.reduce();
+        return frac;
     }
-    Fraction& operator--(const Fraction& frac1)
+
+    // Postfix ++
+    Fraction operator++(Fraction &frac1, int num)
     {
-    Fraction& f = const_cast<Fraction&>(frac1);
-    f.numerator-= f.denominator;
-    //f.reduce();
-    return f;
+        Fraction oldFraction = Fraction(frac1.numerator, frac1.denominator);
+        frac1.numerator += frac1.denominator;
+        return oldFraction;
     }
-    bool operator>(const Fraction& frac1, const float num)
+
+    // Postfix --
+    Fraction operator--(Fraction &frac1, int num)
     {
-        return true;
+        Fraction oldFraction = Fraction(frac1.numerator, frac1.denominator);
+        frac1.numerator -= frac1.denominator;
+        return oldFraction;
     }
-    bool operator>=(const Fraction& frac1,const Fraction& frac2)
+
+    // Prefix ++
+    Fraction operator++(Fraction &frac1)
     {
-        return true;
+        Fraction &frac = const_cast<Fraction &>(frac1);
+        frac.numerator += frac.denominator;
+        frac.reduce();
+        return frac;
     }
+
+    // Prefix --
+    Fraction &operator--(Fraction &frac1)
+    {
+        Fraction &frac = const_cast<Fraction &>(frac1);
+        frac.numerator -= frac.denominator;
+        frac.reduce();
+        return frac;
+    }
+
+    bool operator>(const Fraction &frac1, Fraction &frac2)
+    {
+        int crossProduct1 = frac1.numerator * frac2.denominator;
+        int crossProduct2 = frac2.numerator * frac1.denominator;
+
+        // Compare the cross products
+        return crossProduct1 > crossProduct2;
+    }
+
+    bool operator>(const Fraction &frac1, const float num)
+    {
+        Fraction frac = Fraction(num);
+        int crossProduct1 = frac1.numerator * frac.denominator;
+        int crossProduct2 = frac.numerator * frac1.denominator;
+
+        // Compare the cross products
+        return crossProduct1 > crossProduct2;
+    }
+
+    bool operator>=(const Fraction &frac1, const Fraction &frac2)
+    {
+        int crossProduct1 = frac1.numerator * frac2.denominator;
+        int crossProduct2 = frac2.numerator * frac1.denominator;
+
+        // Compare the cross products
+        return crossProduct1 >= crossProduct2;
+    }
+
+    bool operator>=(const Fraction &frac1, float num)
+    {
+        Fraction frac = Fraction(num);
+        int crossProduct1 = frac1.numerator * frac.denominator;
+        int crossProduct2 = frac.numerator * frac1.denominator;
+
+        // Compare the cross products
+        return crossProduct1 >= crossProduct2;
+    }
+
+    bool operator<(const Fraction &frac1, Fraction &frac2)
+    {
+        int crossProduct1 = frac1.numerator * frac2.denominator;
+        int crossProduct2 = frac2.numerator * frac1.denominator;
+
+        // Compare the cross products
+        return crossProduct1 < crossProduct2;
+    }
+
+    bool operator<(const Fraction &frac1, const float num)
+    {
+        Fraction frac = Fraction(num);
+        int crossProduct1 = frac1.numerator * frac.denominator;
+        int crossProduct2 = frac.numerator * frac1.denominator;
+
+        // Compare the cross products
+        return crossProduct1 < crossProduct2;
+    }
+
+    bool operator<=(const Fraction &frac1, const Fraction &frac2)
+    {
+        int crossProduct1 = frac1.numerator * frac2.denominator;
+        int crossProduct2 = frac2.numerator * frac1.denominator;
+
+        // Compare the cross products
+        return crossProduct1 <= crossProduct2;
+    }
+
+    bool operator<=(const Fraction &frac1, float num)
+    {
+        Fraction frac = Fraction(num);
+        int crossProduct1 = frac1.numerator * frac.denominator;
+        int crossProduct2 = frac.numerator * frac1.denominator;
+
+        // Compare the cross products
+        return crossProduct1 <= crossProduct2;
+    }
+
+    bool operator==(const Fraction &frac1 , const Fraction &frac2)
+    {
+        int crossProduct1 = frac1.numerator * frac2.denominator;
+        int crossProduct2 = frac2.numerator * frac1.denominator;
+
+        // Compare the cross products
+        return crossProduct1 == crossProduct2;
+    }
+
+    bool operator==(const Fraction &frac1 , const float num)
+    {
+        Fraction frac = Fraction(num);
+        int crossProduct1 = frac1.numerator * frac.denominator;
+        int crossProduct2 = frac.numerator * frac1.denominator;
+
+        // Compare the cross products
+        return crossProduct1 == crossProduct2;
+    }
+
+
 
 }
-
-

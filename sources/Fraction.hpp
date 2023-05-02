@@ -12,7 +12,7 @@ namespace ariel
 
     //Help functions
     int gcd(int num1, int num2);
-    void reduce(Fraction& fraction); 
+    void reduce(); 
     
     // Constructors
     Fraction(int numerator, int denominator);
@@ -24,15 +24,24 @@ namespace ariel
     friend Fraction operator+(const Fraction& frac1, const Fraction& frac2);
     friend Fraction operator+(const Fraction &frac1, float num);
     friend Fraction operator-(const Fraction& frac1 , const Fraction& frac2);
-    friend Fraction operator-(const Fraction& frac1 , int num);
+    friend Fraction operator-(const Fraction& frac1 , float num);
     friend Fraction operator/(const Fraction& frac1 , const Fraction& frac2);
     friend Fraction operator*(const Fraction& frac1 , const Fraction& frac2);
     friend Fraction operator*(float num , const Fraction& frac1);
-    friend Fraction operator++(const Fraction& frac1 , int num);
-    friend Fraction& operator--(const Fraction& frac1);
+    friend Fraction operator++(Fraction& frac1 , int num);
+    friend Fraction& operator--(Fraction& frac1);
     friend bool operator>(const Fraction& frac1, float num);
-    friend bool operator>=(const Fraction& frac1,const Fraction& frac2);
-
+    friend bool operator>=(const Fraction& frac1, const Fraction& frac2);
+    friend bool operator>=(const Fraction& frac1, float num);
+    friend bool operator>(const Fraction& frac1, const Fraction& frac2);
+    friend bool operator<(const Fraction& frac1, Fraction& frac2);
+    friend bool operator<(const Fraction& frac1, const float num);
+    friend bool operator<=(const Fraction& frac1,const Fraction& frac2);
+    friend bool operator<=(const Fraction& frac1, float num);
+    friend bool operator==(const Fraction &frac1 , const Fraction &frac2);
+    friend bool operator==(const Fraction &frac1 , const float num);
+    friend std::istream &operator>>(istream& num , Fraction& frac1);
+    
     };
 
 }
