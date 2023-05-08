@@ -57,7 +57,23 @@ namespace ariel
     // Operator >>
     std::istream &operator>>(istream& num , Fraction& frac1)
     {
-        
+        int numer,denom ;
+        num >> numer;
+        num >> denom;
+        if (denom == 0)
+        {
+            throw std::runtime_error("Division by zero is unposibble.");
+        }
+        else if (denom < 0)
+        {
+            denom = denom*-1;
+        }
+        else if (numer < 0)
+        {
+            numer = numer*-1;
+        }
+        frac1.numerator = numer;
+        frac1.denominator = denom;
     }
 
     Fraction operator+(const Fraction &frac1, const Fraction &frac2)
