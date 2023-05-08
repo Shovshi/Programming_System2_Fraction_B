@@ -4,7 +4,7 @@
 namespace ariel
 {
 
-    // Help function
+    // Help functions
     int Fraction::gcd(int num1, int num2)
     {
         if (num2 == 0)
@@ -126,6 +126,26 @@ namespace ariel
         Fraction frac = Fraction(numerator, denominator);
         return frac;
     }
+
+
+    Fraction operator/(const Fraction &frac1, float num)
+    {
+        Fraction frac2 = Fraction(num);
+        return frac1 / frac2;
+    }
+
+    Fraction operator/(float num, const Fraction &frac1)
+    {
+        Fraction frac2 = Fraction(num);
+        return frac2 / frac1;
+    }
+
+    Fraction operator*(float num , const Fraction& frac1)
+    {
+        Fraction frac = Fraction(frac1.numerator * (int)(num * 1000), 1000 * frac1.denominator);
+        // frac.reduce();
+        return frac;
+    }
     Fraction operator*(const Fraction &frac1, const Fraction &frac2)
     {
         int numerator = frac1.numerator * frac2.numerator;
@@ -157,9 +177,9 @@ namespace ariel
     }
 
     // Prefix ++
-    Fraction operator++(Fraction &frac1)
+    Fraction Fraction::operator++(int num)
     {
-        Fraction &frac = const_cast<Fraction &>(frac1);
+        Fraction &frac = const_cast<Fraction &>(this);
         frac.numerator += frac.denominator;
         frac.reduce();
         return frac;
